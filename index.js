@@ -3,9 +3,13 @@ const jwt=require("jsonwebtoken");
 const app=express();
 app.use(express.json());
 const jwtsecret="umangrandom";
-const PORT=9057;
+const PORT=9597;
 
 const users=[]
+app.get("/",(req,res)=>{
+    res.sendFile(__dirname+ "/public/index.html");
+
+})
 
 app.post("/signup",(req,res)=>{
    const username=req.body.username;
@@ -45,18 +49,41 @@ app.post("/signin",(req,res)=>{
    }
 
 })
-app.get("/me", (req, res) => {
-    const token = req.headers.token;
-    const decodeData = jwt.verify(token, jwtsecret);
-  
-    const foundUser = users.find(user => user.username === decodeData.username);
-  
+function auth(req ,res,next){
+    const token =req.headers.token;
+    const decodeData=jwt.verify(token,jwtsecret);
+    if(decodeData.username){
+        req.username=decodeData.username;
+        next();
+
+    }
+    else{
+        res.json({
+            message:"logged in"
+
+        })
+
+    }
+
+}
+
+app.get("/me", auth, (req, res) => {
+    const foundUser = users.find(user => user.username === req.username);
     res.json({
-      username: foundUser.username,
-      password: foundUser.password
+        username: foundUser.username,
+        password: foundUser.password
     });
-  });
-  
+});
+
+// app.get("/todo",auth,(req,res)=>{
+
+// })
+// app.post("/todos",auth,(req,res)=>{
+    
+// })
+// app.delete("/todos",auth,(req,res)=>{
+    
+// })
 
 
 app.listen(PORT,()=>{

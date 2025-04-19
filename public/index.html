@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>auth web</title>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+
+<script>
+   async function signup(){
+        const username=document.getElementById("signup-username").value;
+        const password=document.getElementById("signup-password").value;
+     await  axios.post("http://localhost:9597/signup",{
+            username:username,
+            password:password
+
+        })
+        alert("you r signed in");
+    }
+   async function signin(){
+
+        const username=document.getElementById("signin-username").value;
+        const password=document.getElementById("signin-password").value;
+        const response= await axios.post("http://localhost:9597/signin",{
+            username:username,
+            password:password
+        });
+        localStorage.setItem("token",response.data.token)
+        alert("you are signed")
+
+    }
+
+
+
+    async function getuserinformation() {
+    const response = await axios.get("http://localhost:9597/me", {
+        headers: {
+            token: localStorage.getItem("token")
+        }
+    });
+
+    // ✅ Fix: 'getElementByIda' ➡ 'getElementById'
+    document.getElementById("information").innerHTML = 
+        response.data.username + " " + response.data.password;
+}
+
+getuserinformation();
+function logout(){
+    localStorage.removeItem("token");
+}
+
+</script>
+
+<body>
+
+
+    <div>
+        signup
+        <input id="signup-username" type="text" name="username">
+        <input id="signup-password" type="text" name="password">
+        <button onclick="signup()">submit</button>
+    </div>
+    <div>
+        signin
+        <input id="signin-username" type="text" name="username">
+        <input id="signin-password" type="text" name="password">
+        <button onclick="signin()">submit</button>
+    </div>
+    <div>
+        user info
+        <div id="information"></div>
+    </div>
+    <button onclick="logout()">logout</button>
+
+
+
+    
+</body>
+</html>
